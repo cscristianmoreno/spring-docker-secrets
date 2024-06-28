@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: app-service
+  config:
+    import:
+      - configtree:/run/secrets/
+  datasource:
+    url: jdbc:mysql://mysql-service:3306/users?createDatabaseIfNotExist=true
+    username: ${mysql_user_secret}
+    password: ${mysql_password_secret}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    generate-ddl: true
+    database-platform: 
+    show-sql: true
+    hibernate:
+      ddl-auto: update

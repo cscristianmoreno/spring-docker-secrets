@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  mysql-service:
+    image: mysql:latest
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - db_volume:/var/lib/mysql
+    secrets:
+      - mysql_password_secret
+      - mysql_user_secret
+    ports:
+      - 33060:3306
+
+  app-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mysql-service:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    secrets:
+      - mysql_user_secret
+      - mysql_password_secret
+
+volumes:
+  db_volume:
+
+secrets:
+  mysql_password_secret:
+    file: ./password.bin
+  mysql_user_secret:
+    file: ./user.bin
